@@ -1,0 +1,47 @@
+{% extends 'todolist/base.html' %}
+
+{% block content %}
+<h2>Add new Todo</h2>
+<form action="{% url 'todoes' %}" method="post">
+    {% csrf_token %}
+    {% if errors %}
+    {% for e in errors %}
+    <div class="alert alert-danger" role="alert">{{ e }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% for f in form %}
+    <p>{{f.label}}: {{f}}</p>
+    {% endfor %}
+    <p><input type="submit" value="Add Todo!" class="btn btn-primary"></p>
+</form>
+
+
+<h1>Your Todoes</h1>
+<table class="table table-sm">
+    <tbody>
+    {% if todoes %}
+    {% for todo in todoes %}
+    <tr>
+        <th scope="col"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></th>
+        <th scope="col">{{todo.timestamp_deadline}}</th>
+        <th scope="col">
+            <form action="{% url 'done_todo'%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-success btn-sm" name="done_todo">Done</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+            </form>
+        </th>
+        <th scope="col">
+            <form action="{% url 'remove_todo'%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm" name="remove_todo">Remove</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+            </form>
+        </th>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+{% endblock %}

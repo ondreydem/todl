@@ -1,0 +1,22 @@
+{% extends 'todolist/base.html' %}
+
+
+{% block content %}
+<h1>Registration</h1>
+<div class="form">
+<form action="{% url 'register' %}" method="post">
+    {% csrf_token %}
+    {% if errors %}
+    {% for e in errors %}
+     <div class="alert alert-danger" role="alert">{{ e }}</div>
+    {% endfor %}
+    {% endif %}
+
+    {% for f in form %}
+    <p>{{f.label}}: {{f}}</p>
+    {% endfor %}
+    <p><input type="submit" value="Submit!" class="btn btn-primary"></p>
+</form>
+</div>
+{% endblock %}
+

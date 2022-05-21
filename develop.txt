@@ -1,0 +1,14 @@
+1. Mainpage with about
+2. Login page
+3. Registration page
+4. Today TODOes list
+5. Calendar
+6. Add TODO page/window
+
+
+v.0 == base todo list, registration, deadline, etc
+login == done
+registration == done
+
+v.0.1 == add tags and done-counter (how much time user spend for done TODO)
+v.0.2 == registration and lossing by apple/google
