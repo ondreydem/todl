@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import login, authenticate, logout
-from django.views.generic import View, FormView
-from django.http import HttpResponse
+from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 
 from .utils import DataMixin
 from .forms import RegisterForm, LoginForm, AddingTodoForm
@@ -49,7 +49,7 @@ class LoginPage(View, DataMixin):
             cd = form.cleaned_data
             user = authenticate(username=cd['username'], password=cd['password'])
             login(request, user)
-            return redirect('home')
+            return redirect('todoes')
         else:
             return self.get(request, form.errors)
 
@@ -65,17 +65,12 @@ class RegistrationPage(View, DataMixin):
     template_name = 'todolist/register.html'
     title = 'Registration page'
 
-    def get(self, request, *errors):
+    def get(self, request, errors=None):
         form = RegisterForm()
-        if not errors:
-            return render(request, self.template_name, {'form': form,
-                                                        'title': self.title,
-                                                        'menu': self.menu})
-        else:
-            return render(request, self.template_name, {'form': form,
-                                                        'menu': self.menu,
-                                                        'title': self.title,
-                                                        'errors': errors})
+        return render(request, self.template_name, {'form': form,
+                                                    'menu': self.menu,
+                                                    'title': self.title,
+                                                    'errors': errors})
 
     def post(self, requset):
         form = RegisterForm(requset.POST)
@@ -94,14 +89,15 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
     template_name = 'todolist/todoes.html'
     title = 'Todoes page'
 
-    def get(self, request):
+    def get(self, request, errors=None):
         form = AddingTodoForm()
         user = request.user
-        todoes = Todo.objects.filter(user_id=user.id, status=False).order_by('-timestamp_deadline')
+        todoes = Todo.objects.filter(user_id=user.id, status=False).order_by('-timestamp_todo')
         return render(request, self.template_name, {'menu': self.logged_menu,
                                                     'title': self.title,
                                                     'form': form,
-                                                    'todoes': todoes})
+                                                    'todoes': todoes,
+                                                    'errors': errors})
 
     def post(self, request):
         form = AddingTodoForm(request.POST)
@@ -109,15 +105,16 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
         if form.is_valid():
             cd = form.cleaned_data
             todo = Todo.objects.create(title=cd.get('title'),
-                                       timestamp_deadline=cd.get('timestamp_deadline'),
+                                       timestamp_todo=cd.get('timestamp_todo'),
                                        user_id=user.id)
             todo.save()
-            return self.get(request)
+        return self.get(request, form.errors)
+
 
 
 class RemoveTodo(View, LoginRequiredMixin):
     def post(self, request):
-        todo_id = request.POST['todo_id'][0]
+        todo_id = request.POST['todo_id']
         todo = Todo.objects.get(id=todo_id)
         todo.delete()
         return redirect('todoes')
@@ -125,9 +122,10 @@ class RemoveTodo(View, LoginRequiredMixin):
 
 class DoneTodo(View, LoginRequiredMixin):
     def post(self, request):
-        todo_id = request.POST['todo_id'][0]
+        todo_id = request.POST['todo_id']
         todo = Todo.objects.get(id=todo_id)
         todo.status = True
+        todo.timestamp_done = timezone.now()
         todo.save()
         return redirect('todoes')
 

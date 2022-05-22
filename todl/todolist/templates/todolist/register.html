@@ -7,9 +7,7 @@
 <form action="{% url 'register' %}" method="post">
     {% csrf_token %}
     {% if errors %}
-    {% for e in errors %}
-     <div class="alert alert-danger" role="alert">{{ e }}</div>
-    {% endfor %}
+    <div class="alert alert-danger" role="alert">{{ errors }}</div>
     {% endif %}
 
     {% for f in form %}

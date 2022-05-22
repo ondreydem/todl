@@ -1,6 +1,8 @@
 from django import forms
 from .models import User
 from django.contrib.auth import authenticate
+from django.http import HttpResponse
+from django.utils import timezone
 
 
 class RegisterForm(forms.ModelForm):
@@ -56,5 +58,12 @@ class AddingTodoForm(forms.Form):
                             max_length=200,
                             required=True,
                             widget=forms.TextInput(attrs={'class': 'form-control'}))
-    timestamp_deadline = forms.DateTimeField(label='Todo deadline',
-                                             widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
+    timestamp_todo = forms.DateTimeField(label='Todo deadline',
+                                         widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
+
+    def clean(self):
+        cd = super(AddingTodoForm, self).clean()
+        if cd.get('timestamp_todo') < timezone.now():
+            msg = "You can't add a todo to the past"
+            self.add_error('timestamp_todo', msg)
+        return cd
