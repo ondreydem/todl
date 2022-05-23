@@ -67,3 +67,16 @@ class AddingTodoForm(forms.Form):
             msg = "You can't add a todo to the past"
             self.add_error('timestamp_todo', msg)
         return cd
+
+
+class EditTodoForm(forms.Form):
+    title = forms.CharField(label='Title',
+                            max_length=200,
+                            required=True,
+                            widget=forms.TextInput(attrs={'class': 'form-control'}))
+    body = forms.CharField(label='Description',
+                           max_length=2000,
+                           required=False,
+                           widget=forms.Textarea(attrs={'class': 'form-control'}))
+    timestamp_todo = forms.DateTimeField(label='Todo deadline',
+                                         widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))

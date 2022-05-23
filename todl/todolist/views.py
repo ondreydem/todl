@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
 from .utils import DataMixin
-from .forms import RegisterForm, LoginForm, AddingTodoForm
+from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm
 from .models import User, Todo
 
 
@@ -111,12 +111,38 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
         return self.get(request, form.errors)
 
 
-
 class RemoveTodo(View, LoginRequiredMixin):
     def post(self, request):
         todo_id = request.POST['todo_id']
         todo = Todo.objects.get(id=todo_id)
         todo.delete()
+        return redirect('todoes')
+
+
+class EditTodo(View, LoginRequiredMixin, DataMixin):
+    title = 'Edit todo'
+    template_name = 'todolist/edit_todo.html'
+
+    def get(self, request, todo_id):
+        todo = Todo.objects.get(id=todo_id)
+        form = EditTodoForm(initial={'title': todo.title,
+                                     'body': todo.body,
+                                     'timestamp_todo': todo.timestamp_todo})
+        return render(request, self.template_name, {'menu': self.logged_menu,
+                                                    'title': self.title,
+                                                    'form': form,
+                                                    'todo': todo})
+
+    def post(self, request, todo_id):
+        todo_id = request.POST.get('todo_id')
+        todo = Todo.objects.get(id=todo_id)
+        form = EditTodoForm(request.POST)
+        if form.is_valid() and form.has_changed():
+            cd = form.cleaned_data
+            todo.title = cd.get('title')
+            todo.body = cd.get('body')
+            todo.timestamp_todo = cd.get('timestamp_todo')
+            todo.save()
         return redirect('todoes')
 
 
@@ -131,9 +157,22 @@ class DoneTodo(View, LoginRequiredMixin):
 
 
 class TodoPage(View, DataMixin, LoginRequiredMixin):
-    def get(self, requset):
-        return render(requset, 'todolist/todo.html', {'menu': self.logged_menu})
+    template_name = 'todolist/todo.html'
+    title = 'Todo page'
+
+    def get(self, requset, todo_id):
+        todo = Todo.objects.get(id=todo_id)
+        return render(requset, self.template_name, {'menu': self.logged_menu,
+                                                    'title': self.title,
+                                                    'todo': todo})
 
 
 class CompleteTodoesPage(View, DataMixin, LoginRequiredMixin):
-    pass
+    template_name = 'todolist/complete_todoes.html'
+    title = 'Complete todoes'
+
+    def get(self, request):
+        compl_todoes = Todo.objects.filter(user_id=request.user.id, status=True).order_by('-timestamp_done')
+        return render(request, self.template_name, {'menu': self.logged_menu,
+                                                    'title': self.title,
+                                                    'todoes': compl_todoes})

@@ -11,6 +11,7 @@ class DataMixin:
     logged_menu = [{'title': 'About', 'url_name': 'about'},
                    {'title': 'Logout', 'url_name': 'logout'},
                    {'title': 'Completed todoes', 'url_name': 'completed_todoes'},
+                   {'title': 'Your todoes', 'url_name': 'todoes'},
                    # {'title': 'Edit Profile', 'url_name': 'edit'},
                    ]
 

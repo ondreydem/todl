@@ -24,6 +24,13 @@
         <th scope="col"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></th>
         <th scope="col">{{todo.timestamp_todo}}</th>
         <th scope="col">
+            <form action="{% url 'edit_todo' todo.id%}" method="get" name="todoes">
+                <button type="submit" class="btn btn-outline-info btn-sm" name="edit">Edit</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+                <input type="hidden" value="todoes" name="from">
+            </form>
+        </th>
+        <th scope="col">
             <form action="{% url 'done_todo'%}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-success btn-sm" name="done_todo">Done</button>

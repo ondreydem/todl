@@ -1,0 +1,18 @@
+{% extends 'todolist/base.html' %}
+
+{% block content %}
+<div class="form">
+        <form action="{% url 'edit_todo' todo.id %}" method="post">
+            {% csrf_token %}
+            {% if errors %}
+            <div class="alert alert-danger" role="alert">{{ errors }}</div>
+            {% endif %}
+
+            {% for f in form %}
+            <p>{{f.label}}: {{f}}</p>
+            {% endfor %}
+            <p><input type="submit" value="Submit!" class="btn btn-primary"></p>
+            <input type="hidden" value="{{todo.id}}" name="todo_id">
+        </form>
+</div>
+{% endblock %}

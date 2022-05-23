@@ -1,5 +1,24 @@
 {% extends 'todolist/base.html' %}
 
 {% block content %}
-<h1>ABOBA</h1>
+<h1>Your complete todoes</h1>
+<table class="table table-sm">
+    <tbody>
+    {% if todoes %}
+    {% for todo in todoes %}
+    <tr>
+        <th scope="col"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></th>
+        <th scope="col">{{todo.timestamp_done}}</th>
+        <th scope="col">
+            <form action="{% url 'remove_todo'%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm" name="remove_todo">Remove</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+            </form>
+        </th>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
 {% endblock %}

@@ -1,5 +1,40 @@
 {% extends 'todolist/base.html' %}
 
 {% block content %}
-<h1>ABOBA</h1>
+{% if todo.status == False %}
+<h2>{{todo.title}}</h2>
+<p><i>Todo deadline at {{todo.timestamp_todo}}</i></p>
+{% if todo.body %}
+<p>{{todo.body}}</p>
+{% else %}
+<p><i>Here can be a todo-description. <a href="#">Click to add</a></i></p>
+{% endif %}
+{% endif %}
+<table class="table table-sm">
+    <tbody>
+    <tr>
+        <th scope="col">
+            <form action="{% url 'edit_todo' todo.id%}" method="get" name="todo">
+                <button type="submit" class="btn btn-outline-info" name="edit">Edit</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+                <input type="hidden" value="todo" name="from">
+            </form>
+        </th>
+        <th scope="col">
+            <form action="{% url 'done_todo'%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-success" name="done_todo">Done</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+            </form>
+        </th>
+        <th scope="col">
+            <form action="{% url 'remove_todo'%}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger" name="remove_todo">Remove</button>
+                <input type="hidden" value="{{todo.id}}" name="todo_id">
+            </form>
+        </th>
+    </tr>
+    </tbody>
+</table>
 {% endblock %}
