@@ -80,7 +80,13 @@ class RegistrationPage(View, DataMixin):
                                             email=cd['email'],
                                             password=cd['password'])
             user.save()
-            return redirect(reverse('home'))
+            user = authenticate(username=cd['username'], password=cd['password'])
+            if user:
+                login(requset, user)
+                return redirect(reverse('todoes'))
+            else:
+                msg = 'Something went wrong, please try again'
+                return self.get(requset, errors=msg)
         else:
             return self.get(requset, form.errors)
 
