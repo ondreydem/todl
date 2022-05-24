@@ -13,3 +13,9 @@ class Todo(models.Model):
     timestamp_done = models.DateTimeField(null=True)
     status = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class TodoTags(models.Model):
+    tag_name = models.CharField(max_length=60)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+

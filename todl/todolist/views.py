@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from .utils import DataMixin
 from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm
-from .models import User, Todo
+from .models import User, Todo, TodoTags
 
 
 # Create your views here.
@@ -82,6 +82,8 @@ class RegistrationPage(View, DataMixin):
             user.save()
             user = authenticate(username=cd['username'], password=cd['password'])
             if user:
+                for tag in self.base_tags:
+                    base_tags = TodoTags.objects.create(tag_name=tag.get('tag_name'), user_id=user)
                 login(requset, user)
                 return redirect(reverse('todoes'))
             else:
