@@ -1,8 +1,10 @@
 from django import forms
-from .models import User
+from .models import User, TodoTags
 from django.contrib.auth import authenticate
-from django.http import HttpResponse
 from django.utils import timezone
+
+
+# from .utils import tags
 
 
 class RegisterForm(forms.ModelForm):
@@ -53,6 +55,13 @@ class LoginForm(forms.Form):
         return cd
 
 
+ch = [
+    ('blue', 'Blue'),
+    ('green', 'Green'),
+    ('black', 'Black'),
+]
+
+
 class AddingTodoForm(forms.Form):
     title = forms.CharField(label='Title',
                             max_length=200,
@@ -60,6 +69,15 @@ class AddingTodoForm(forms.Form):
                             widget=forms.TextInput(attrs={'class': 'form-control'}))
     timestamp_todo = forms.DateTimeField(label='Todo deadline',
                                          widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
+    tag = forms.MultipleChoiceField(label='Choose tags',
+                                    required=False,
+                                    widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        tags = [(tag.tag_name, tag.tag_name) for tag in TodoTags.objects.filter(user_id=self.user.id)]
+        self.fields['tag'].choices = tags
 
     def clean(self):
         cd = super(AddingTodoForm, self).clean()
@@ -80,3 +98,16 @@ class EditTodoForm(forms.Form):
                            widget=forms.Textarea(attrs={'class': 'form-control'}))
     timestamp_todo = forms.DateTimeField(label='Todo deadline',
                                          widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
+    tag = forms.MultipleChoiceField(label='Choose tags',
+                                    required=False,
+                                    widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        tags = [(tag.tag_name, tag.tag_name) for tag in TodoTags.objects.filter(user_id=self.user.id)]
+        self.fields['tag'].choices = tags
+
+
+class CreateTagForm(forms.Form):
+    tag_name = forms.CharField(label='Tag name', widget=forms.TextInput(attrs={'class': 'form-control'}))
