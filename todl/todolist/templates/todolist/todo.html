@@ -1,17 +1,30 @@
 {% extends 'todolist/base.html' %}
 
 {% block content %}
+
 {% if todo.status == False %}
-<h2>{{todo.title}}</h2>
-<p><i>Todo deadline at {{todo.timestamp_todo}}</i></p>
-{% if todo.body %}
-<p>{{todo.body}}</p>
+    <h2>{{todo.title}}</h2>
+    {% if todo.tags.all %}
+        {% for tag in todo.tags.all %}
+        <span class="badge badge-pill badge-primary">{{tag.tag_name}}</span>
+        {% endfor %}
+    {% endif %}
+    <p><i>Todo deadline at {{todo.timestamp_todo}}</i></p>
+    {% if todo.body %}
+        <p>{{todo.body}}</p>
+    {% else %}
+        <p><i>Here can be a todo-description.
+            <a href="{% url 'edit_todo' todo.id%}" name="from" value="todo">Click to add</a></i></p>
+    {% endif %}
 {% else %}
-<p><i>Here can be a todo-description. <a href="#">Click to add</a></i></p>
+    <h2>{{todo.title}}</h2>
+    <p><i>Done at {{todo.timestamp_done}}</i></p>
+    <p>{{todo.body}}</p>
 {% endif %}
-{% endif %}
+
 <table class="table table-sm">
     <tbody>
+    {% if todo.status == False %}
     <tr>
         <th scope="col">
             <form action="{% url 'edit_todo' todo.id%}" method="get" name="todo">
@@ -27,10 +40,11 @@
                 <input type="hidden" value="{{todo.id}}" name="todo_id">
             </form>
         </th>
+        {% endif %}
         <th scope="col">
             <form action="{% url 'remove_todo'%}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger" name="remove_todo">Remove</button>
+                <button type="submit" class="btn btn-outline-danger" name="remove_todo">Remove ToDo</button>
                 <input type="hidden" value="{{todo.id}}" name="todo_id">
             </form>
         </th>

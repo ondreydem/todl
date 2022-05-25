@@ -1,0 +1,49 @@
+{% extends 'todolist/base.html' %}
+
+{% block content %}
+<h1>Create tag</h1>
+<form action="{% url 'edit_tags' %}" method="post">
+    {% csrf_token %}
+    {% if errors %}
+    <div class="alert alert-danger" role="alert">{{ errors }}</div>
+    {% endif %}
+
+    {% for f in form %}
+    <p>{{f.label}}: {{f}}</p>
+    {% endfor %}
+    <p><input type="submit" value="Create tag!" class="btn btn-primary"></p>
+</form>
+
+<h1>Your Tags</h1>
+<table class="table table-sm">
+    <tbody>
+    {% if tags %}
+    {% for tag in tags %}
+    <tr>
+        <th scope="col">{{tag.tag_name}}</th>
+        <th>
+        {% if tag.todo_set.all %}
+        {% for todo in tag.todo_set.all %}
+            <a href="{% url 'todo' todo.pk %}">{{ todo.title }},</a>
+        {% endfor %}
+        {% endif %}
+        </th>
+        <th scope="col">
+            <form action="{% url 'edit_tags' %}" method="get" name="edit_tags">
+                <button type="submit" class="btn btn-outline-info btn-sm" name="edit">Edit</button>
+                <input type="hidden" value="{{tag.id}}" name="tag_id">
+            </form>
+        </th>
+        <th scope="col">
+            <form action="{% url 'delete_tag' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm" name="remove_todo">Delete</button>
+                <input type="hidden" value="{{tag.id}}" name="tag_id">
+            </form>
+        </th>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+{% endblock %}

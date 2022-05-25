@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
 from .utils import DataMixin
-from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm
+from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm, CreateTagForm
 from .models import User, Todo, TodoTags
 
 
@@ -98,9 +98,9 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
     title = 'Todoes page'
 
     def get(self, request, errors=None):
-        form = AddingTodoForm()
+        form = AddingTodoForm(user=request.user)
         user = request.user
-        todoes = Todo.objects.filter(user_id=user.id, status=False).order_by('-timestamp_todo')
+        todoes = Todo.objects.filter(user_id=user.id, status=False).order_by('timestamp_todo')
         return render(request, self.template_name, {'menu': self.logged_menu,
                                                     'title': self.title,
                                                     'form': form,
@@ -108,7 +108,8 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
                                                     'errors': errors})
 
     def post(self, request):
-        form = AddingTodoForm(request.POST)
+        # Add tag adding playwords
+        form = AddingTodoForm(request.POST, user=request.user)
         user = request.user
         if form.is_valid():
             cd = form.cleaned_data
@@ -116,6 +117,10 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
                                        timestamp_todo=cd.get('timestamp_todo'),
                                        user_id=user.id)
             todo.save()
+            if cd.get('tag'):
+                for t in cd.get('tag'):
+                    tag = TodoTags.objects.filter(user_id=user.id).get(tag_name=t)
+                    todo.tags.add(tag)
         return self.get(request, form.errors)
 
 
@@ -133,9 +138,12 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
 
     def get(self, request, todo_id):
         todo = Todo.objects.get(id=todo_id)
-        form = EditTodoForm(initial={'title': todo.title,
+        tags = [tag.tag_name for tag in todo.tags.all()]
+        form = EditTodoForm(user=request.user,
+                            initial={'title': todo.title,
                                      'body': todo.body,
-                                     'timestamp_todo': todo.timestamp_todo})
+                                     'timestamp_todo': todo.timestamp_todo,
+                                     'tag': tags})
         return render(request, self.template_name, {'menu': self.logged_menu,
                                                     'title': self.title,
                                                     'form': form,
@@ -144,9 +152,14 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
     def post(self, request, todo_id):
         todo_id = request.POST.get('todo_id')
         todo = Todo.objects.get(id=todo_id)
-        form = EditTodoForm(request.POST)
+        form = EditTodoForm(request.POST, user=request.user)
         if form.is_valid() and form.has_changed():
             cd = form.cleaned_data
+            for tag in TodoTags.objects.filter(user_id=request.user.id):
+                if tag.tag_name in cd.get('tag'):
+                    todo.tags.add(tag)
+                else:
+                    todo.tags.remove(tag)
             todo.title = cd.get('title')
             todo.body = cd.get('body')
             todo.timestamp_todo = cd.get('timestamp_todo')
@@ -180,7 +193,49 @@ class CompleteTodoesPage(View, DataMixin, LoginRequiredMixin):
     title = 'Complete todoes'
 
     def get(self, request):
-        compl_todoes = Todo.objects.filter(user_id=request.user.id, status=True).order_by('-timestamp_done')
+        compl_todoes = Todo.objects.filter(user_id=request.user.id, status=True).order_by('timestamp_done')
         return render(request, self.template_name, {'menu': self.logged_menu,
                                                     'title': self.title,
                                                     'todoes': compl_todoes})
+
+
+# class AddTagTodo(View, DataMixin, LoginRequiredMixin):
+#     # maybe don't need
+#     pass
+#
+#
+# class RemoveTagTodo(View, DataMixin, LoginRequiredMixin):
+#     pass
+
+
+# class CreateTag(View, DataMixin, LoginRequiredMixin):
+#     pass
+
+
+class EditTags(View, DataMixin, LoginRequiredMixin):
+    template_name = 'todolist/edit_tags.html'
+    title = 'Edit tags'
+
+    def get(self, request):
+        form = CreateTagForm()
+        tags = TodoTags.objects.filter(user_id=request.user.id)
+        return render(request, self.template_name, {'menu': self.logged_menu,
+                                                    'title': self.title,
+                                                    'form': form,
+                                                    'tags': tags})
+
+    def post(self, request):
+        form = CreateTagForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            tag = TodoTags.objects.create(tag_name=cd.get('tag_name'), user_id=request.user)
+            tag.save()
+            return self.get(request)
+
+
+class DeleteTag(View, LoginRequiredMixin):
+    def post(self, request):
+        tag_id = request.POST.get('tag_id')
+        tag = TodoTags.objects.get(id=tag_id)
+        tag.delete()
+        return redirect('edit_tags')

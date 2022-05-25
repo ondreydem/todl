@@ -12,6 +12,7 @@ class DataMixin:
                    {'title': 'Logout', 'url_name': 'logout'},
                    {'title': 'Completed todoes', 'url_name': 'completed_todoes'},
                    {'title': 'Your todoes', 'url_name': 'todoes'},
+                   {'title': 'Your TodoTags', 'url_name': 'edit_tags'}
                    # {'title': 'Edit Profile', 'url_name': 'edit'},
                    ]
 

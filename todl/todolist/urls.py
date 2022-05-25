@@ -17,4 +17,6 @@ urlpatterns = [
     path('todoes/todo/<int:todo_id>/edit_todo/', EditTodo.as_view(), name='edit_todo'),
     path('todoes/completed_todoes/', CompleteTodoesPage.as_view(), name='completed_todoes'),
     path('todoes/todo/<int:todo_id>/', TodoPage.as_view(), name='todo'),
+    path('todoes/edit_tags/', EditTags.as_view(), name='edit_tags'),
+    path('todoes/delete_tag/', DeleteTag.as_view(), name='delete_tag'),
 ]
