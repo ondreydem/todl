@@ -29,15 +29,15 @@
         {% endif %}
         </th>
         <th scope="col">
-            <form action="{% url 'edit_tags' %}" method="get" name="edit_tags">
-                <button type="submit" class="btn btn-outline-info btn-sm" name="edit">Edit</button>
-                <input type="hidden" value="{{tag.id}}" name="tag_id">
-            </form>
+<!--            <form action="{% url 'edit_tags' %}" method="get" name="edit_tags">-->
+<!--                <button type="submit" class="btn btn-outline-info btn-sm" name="edit">Edit</button>-->
+<!--                <input type="hidden" value="{{tag.id}}" name="tag_id">-->
+<!--            </form>-->
         </th>
         <th scope="col">
             <form action="{% url 'delete_tag' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger btn-sm" name="remove_todo">Delete</button>
+                <button type="submit" class="btn btn-outline-danger btn-sm" name="remove_todo">Delete tag</button>
                 <input type="hidden" value="{{tag.id}}" name="tag_id">
             </form>
         </th>

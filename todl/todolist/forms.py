@@ -55,13 +55,6 @@ class LoginForm(forms.Form):
         return cd
 
 
-ch = [
-    ('blue', 'Blue'),
-    ('green', 'Green'),
-    ('black', 'Black'),
-]
-
-
 class AddingTodoForm(forms.Form):
     title = forms.CharField(label='Title',
                             max_length=200,

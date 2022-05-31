@@ -9,6 +9,13 @@
     <tr>
         <th scope="col"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></th>
         <th scope="col">{{todo.timestamp_done}}</th>
+        <th>
+        {% if todo.tags %}
+        {% for tag in todo.tags.all %}
+        <span class="badge badge-pill badge-primary">{{tag.tag_name}}</span>
+        {% endfor %}
+        {% endif %}
+        </th>
         <th scope="col">
             <form action="{% url 'remove_todo'%}" method="post">
                 {% csrf_token %}

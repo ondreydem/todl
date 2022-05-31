@@ -22,11 +22,11 @@
     {% for todo in todoes %}
     <tr>
         <th scope="col"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></th>
-        <th scope="col">{{todo.timestamp_todo}}</th>
+        <th scope="col">{{todo.timestamp_todo.date}}</th>
         <th>
         {% if todo.tags %}
         {% for tag in todo.tags.all %}
-        <span class="badge badge-pill badge-primary">{{tag.tag_name}}</span>
+            <a href="#" class="badge badge-primary">{{tag.tag_name}}</a>
         {% endfor %}
         {% endif %}
         </th>

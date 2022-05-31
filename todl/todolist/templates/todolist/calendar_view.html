@@ -1,0 +1,46 @@
+{% extends 'todolist/base.html' %}
+{% load template_filters %}
+
+{% block content %}
+<div>
+    <h1>{{todo_calendar.month_name}}, {{todo_calendar.year}}</h1>
+
+<!--    {% autoescape off %}-->
+<!--    {{calendar}}-->
+<!--    {% endautoescape %}-->
+<!--    <p>{{month_todoes}}</p>-->
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            {% for h in todo_calendar.days_of_the_week %}
+            <th>{{h}}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        {% for weeks in todo_calendar.month_days %}
+        <tr>
+            {% for d in weeks %}
+            <td>
+                <div>
+                    <table class="table table-borderless">
+                        {% if d == todo_calendar.today.day %}
+                        <tr style="align left top"><span class="badge badge-pill badge-primary">{{d}}</span></tr>
+                        {% elif d != 0 %}
+                        <tr style="align left top">{{d}}</tr>
+                        {% endif %}
+
+
+                        {% for todo in month_todoes|get_dict_value:d %}
+                        <li style="font-size: x-small"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></li>
+                        {% endfor %}
+
+                    </table>
+                </div>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="#"><<< prev month</a> | <a href="#">next month >>></a>
+</div>
+{% endblock %}

@@ -1,13 +1,14 @@
+import datetime
+
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
-from .utils import DataMixin
+from .utils import DataMixin, TodoCalendarToView
 from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm, CreateTagForm
 from .models import User, Todo, TodoTags
-
 
 # Create your views here.
 
@@ -108,7 +109,6 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
                                                     'errors': errors})
 
     def post(self, request):
-        # Add tag adding playwords
         form = AddingTodoForm(request.POST, user=request.user)
         user = request.user
         if form.is_valid():
@@ -193,23 +193,10 @@ class CompleteTodoesPage(View, DataMixin, LoginRequiredMixin):
     title = 'Complete todoes'
 
     def get(self, request):
-        compl_todoes = Todo.objects.filter(user_id=request.user.id, status=True).order_by('timestamp_done')
+        compl_todoes = Todo.objects.filter(user_id=request.user.id, status=True).order_by('-timestamp_done')
         return render(request, self.template_name, {'menu': self.logged_menu,
                                                     'title': self.title,
                                                     'todoes': compl_todoes})
-
-
-# class AddTagTodo(View, DataMixin, LoginRequiredMixin):
-#     # maybe don't need
-#     pass
-#
-#
-# class RemoveTagTodo(View, DataMixin, LoginRequiredMixin):
-#     pass
-
-
-# class CreateTag(View, DataMixin, LoginRequiredMixin):
-#     pass
 
 
 class EditTags(View, DataMixin, LoginRequiredMixin):
@@ -239,3 +226,24 @@ class DeleteTag(View, LoginRequiredMixin):
         tag = TodoTags.objects.get(id=tag_id)
         tag.delete()
         return redirect('edit_tags')
+
+
+class CalendarView(View, LoginRequiredMixin, DataMixin):
+    template_name = 'todolist/calendar_view.html'
+    title = 'Calendar view'
+    today = datetime.datetime.today()
+
+    def get(self, request):
+        todo_calendar = TodoCalendarToView(user=request.user, today=self.today)
+        return render(request, self.template_name, {'menu': self.logged_menu,
+                                                    'title': self.title,
+                                                    'todo_calendar': todo_calendar,
+                                                    'month_todoes': todo_calendar.month_todoes})
+
+
+class WeekView(View, LoginRequiredMixin, DataMixin):
+    pass
+
+
+class DayView(View, LoginRequiredMixin, DataMixin):
+    pass
