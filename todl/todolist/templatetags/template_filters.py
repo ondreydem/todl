@@ -9,7 +9,7 @@ def get_dict_value(dictionary, key):
     """
     For get dict values in html-page
     :param dictionary: todolist formed by TodoCalendarToView
-    :param key: int, day number
+    :param key: day number or weekday name
     :return: empty list or list of todoes
     """
     return dictionary.get(key)

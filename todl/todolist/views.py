@@ -10,6 +10,7 @@ from .utils import DataMixin, TodoCalendarToView
 from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm, CreateTagForm
 from .models import User, Todo, TodoTags
 
+
 # Create your views here.
 
 
@@ -126,7 +127,7 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
 
 class RemoveTodo(View, LoginRequiredMixin):
     def post(self, request):
-        todo_id = request.POST['todo_id']
+        todo_id = request.POST.get('todo_id')
         todo = Todo.objects.get(id=todo_id)
         todo.delete()
         return redirect('todoes')
@@ -137,6 +138,7 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
     template_name = 'todolist/edit_todo.html'
 
     def get(self, request, todo_id):
+        print('_______________', request.GET)
         todo = Todo.objects.get(id=todo_id)
         tags = [tag.tag_name for tag in todo.tags.all()]
         form = EditTodoForm(user=request.user,
@@ -229,16 +231,19 @@ class DeleteTag(View, LoginRequiredMixin):
 
 
 class CalendarView(View, LoginRequiredMixin, DataMixin):
-    template_name = 'todolist/calendar_view.html'
+    template_name = 'todolist/month_view.html'
     title = 'Calendar view'
     today = datetime.datetime.today()
 
     def get(self, request):
-        todo_calendar = TodoCalendarToView(user=request.user, today=self.today)
-        return render(request, self.template_name, {'menu': self.logged_menu,
-                                                    'title': self.title,
-                                                    'todo_calendar': todo_calendar,
-                                                    'month_todoes': todo_calendar.month_todoes})
+        # if request.get
+        todo_by_month = TodoCalendarToView(user=request.user)
+        context = {
+            'menu': self.logged_menu,
+            'title': self.title,
+            'todo_calendar': todo_by_month,
+        }
+        return render(request, self.template_name, context)
 
 
 class WeekView(View, LoginRequiredMixin, DataMixin):
@@ -246,4 +251,10 @@ class WeekView(View, LoginRequiredMixin, DataMixin):
 
 
 class DayView(View, LoginRequiredMixin, DataMixin):
-    pass
+    template_name = 'todolist/day_view.html'
+    today = datetime.datetime.today()
+
+    def get(self, request, year, month, day):
+        todo_by_day = TodoCalendarToView(user=request.user, year=year, month=month, day=day)
+        return render(request, self.template_name, {'todo_by_day': todo_by_day,
+                                                    'menu': self.logged_menu})

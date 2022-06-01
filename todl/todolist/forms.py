@@ -2,9 +2,7 @@ from django import forms
 from .models import User, TodoTags
 from django.contrib.auth import authenticate
 from django.utils import timezone
-
-
-# from .utils import tags
+import datetime
 
 
 class RegisterForm(forms.ModelForm):
@@ -60,8 +58,9 @@ class AddingTodoForm(forms.Form):
                             max_length=200,
                             required=True,
                             widget=forms.TextInput(attrs={'class': 'form-control'}))
-    timestamp_todo = forms.DateTimeField(label='Todo deadline',
-                                         widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
+    timestamp_todo = forms.DateField(label='Todo deadline',
+                                     required=True,
+                                     widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
     tag = forms.MultipleChoiceField(label='Choose tags',
                                     required=False,
                                     widget=forms.CheckboxSelectMultiple)
@@ -74,7 +73,7 @@ class AddingTodoForm(forms.Form):
 
     def clean(self):
         cd = super(AddingTodoForm, self).clean()
-        if cd.get('timestamp_todo') < timezone.now():
+        if cd.get('timestamp_todo') < datetime.date.today():
             msg = "You can't add a todo to the past"
             self.add_error('timestamp_todo', msg)
         return cd

@@ -19,8 +19,9 @@ urlpatterns = [
     path('todoes/todo/<int:todo_id>/', TodoPage.as_view(), name='todo'),
     path('todoes/edit_tags/', EditTags.as_view(), name='edit_tags'),
     path('todoes/delete_tag/', DeleteTag.as_view(), name='delete_tag'),
-    # path('todoes/calendar_view/by_month/<int:year>/<int:month>', CalendarView.as_view(), name='calendar_view'),
+    # path('todoes/by_month/<int:year>/<int:month>', CalendarView.as_view(), name='month_view'),
+    path('todoes/by_day/<int:year>/<int:month>/<int:day>', DayView.as_view(), name='day_view'),
     path('todoes/calendar_view/', CalendarView.as_view(), name='calendar_view'),
-    path('todoes/day_view/', DayView.as_view(), name='day_view'),
+    # path('todoes/day_view/', DayView.as_view(), name='day_view'),
 
 ]

@@ -4,11 +4,6 @@
 {% block content %}
 <div>
     <h1>{{todo_calendar.month_name}}, {{todo_calendar.year}}</h1>
-
-<!--    {% autoescape off %}-->
-<!--    {{calendar}}-->
-<!--    {% endautoescape %}-->
-<!--    <p>{{month_todoes}}</p>-->
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -24,16 +19,23 @@
                 <div>
                     <table class="table table-borderless">
                         {% if d == todo_calendar.today.day %}
-                        <tr style="align left top"><span class="badge badge-pill badge-primary">{{d}}</span></tr>
+                        <tr style="align left top">
+                            <span class="badge badge-pill badge-primary">{{d}} </span>
+                        </tr>
                         {% elif d != 0 %}
                         <tr style="align left top">{{d}}</tr>
                         {% endif %}
 
 
-                        {% for todo in month_todoes|get_dict_value:d %}
-                        <li style="font-size: x-small"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></li>
+                        {% for todo in todo_calendar.month_todoes|get_dict_value:d|slice:"3" %}
+                        <li style="font-size: small"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></li>
                         {% endfor %}
-
+                        {% if todo_calendar.month_todoes|get_dict_value:d %}
+                        <a href="{% url 'day_view' year=todo_calendar.year month=todo_calendar.month day=todo_calendar.day %}"
+                           style="font-size: small">
+                            Go to date >>
+                        </a>
+                        {% endif %}
                     </table>
                 </div>
             </td>
