@@ -5,6 +5,10 @@ from django.utils.timezone import make_aware
 
 
 class DataMixin:
+    """
+    Class to realise DRY principe
+    """
+
     menu = [{'title': 'About', 'url_name': 'about'},
             {'title': 'Login', 'url_name': 'login'},
             {'title': 'Registration', 'url_name': 'register'},
@@ -15,15 +19,14 @@ class DataMixin:
                    {'title': 'Completed todoes', 'url_name': 'completed_todoes'},
                    {'title': 'Your todoes', 'url_name': 'todoes'},
                    {'title': 'Your TodoTags', 'url_name': 'edit_tags'},
-                   # {'title': 'Edit Profile', 'url_name': 'edit'},
-                   {'title': 'Calendar view', 'url_name': 'calendar_view'}
-
+                   {'title': 'Calendar view', 'url_name': 'calendar_view'},
                    ]
 
     base_tags = [{'tag_name': 'Task'},
                  {'tag_name': 'Meeting'},
                  {'tag_name': 'Work'},
-                 {'tag_name': 'Home'}]
+                 {'tag_name': 'Home'}
+                 ]
 
 
 class TodoCalendarToView:
@@ -33,7 +36,6 @@ class TodoCalendarToView:
 
     def __init__(self, user, day=today.day, month=today.month, year=today.year):
         """
-
         :param user: take user object
         :param day: take required day int-number. By default == today day number
         :param month: take required month int-number. By default == current/today month number

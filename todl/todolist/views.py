@@ -138,7 +138,6 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
     template_name = 'todolist/edit_todo.html'
 
     def get(self, request, todo_id):
-        print('_______________', request.GET)
         todo = Todo.objects.get(id=todo_id)
         tags = [tag.tag_name for tag in todo.tags.all()]
         form = EditTodoForm(user=request.user,
@@ -237,7 +236,6 @@ class CalendarView(View, LoginRequiredMixin, DataMixin):
 
     def get(self, request):
         if request.GET.get('month'):
-            print(request.GET)
             month = int(request.GET.get('month'))
             year = int(request.GET.get('year'))
             todo_by_month = TodoCalendarToView(user=request.user,

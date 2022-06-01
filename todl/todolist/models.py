@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 class TodoTags(models.Model):
     tag_name = models.CharField(max_length=60)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    # description = models.CharField(max_length=160)
 
 
 class Todo(models.Model):
