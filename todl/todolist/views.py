@@ -236,14 +236,21 @@ class CalendarView(View, LoginRequiredMixin, DataMixin):
     today = datetime.datetime.today()
 
     def get(self, request):
-        # if request.get
+        if request.GET.get('month'):
+            print(request.GET)
+            month = int(request.GET.get('month'))
+            year = int(request.GET.get('year'))
+            todo_by_month = TodoCalendarToView(user=request.user,
+                                               year=year,
+                                               month=month,
+                                               day=1)
+            return render(request, self.template_name, {'menu': self.logged_menu,
+                                                        'title': self.title,
+                                                        'todo_calendar': todo_by_month})
         todo_by_month = TodoCalendarToView(user=request.user)
-        context = {
-            'menu': self.logged_menu,
-            'title': self.title,
-            'todo_calendar': todo_by_month,
-        }
-        return render(request, self.template_name, context)
+        return render(request, self.template_name, {'menu': self.logged_menu,
+                                                    'title': self.title,
+                                                    'todo_calendar': todo_by_month})
 
 
 class WeekView(View, LoginRequiredMixin, DataMixin):

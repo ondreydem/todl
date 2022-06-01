@@ -18,7 +18,7 @@
             <td>
                 <div>
                     <table class="table table-borderless">
-                        {% if d == todo_calendar.today.day %}
+                        {% if d == todo_calendar.today.day and todo_calendar.month == todo_calendar.today.month %}
                         <tr style="align left top">
                             <span class="badge badge-pill badge-primary">{{d}} </span>
                         </tr>
@@ -43,6 +43,17 @@
         </tr>
         {% endfor %}
     </table>
-    <a href="#"><<< prev month</a> | <a href="#">next month >>></a>
+    <span>
+    <form action="{% url 'calendar_view' %}" method="get">
+        <button type="submit" class="btn btn-outline-primary"><<< Prev month</button>
+        <input type="hidden" value="{{todo_calendar.month|add:'-1'}}" name="month">
+        <input type="hidden" value="{{todo_calendar.year}}" name="year">
+    </form>
+    <form action="{% url 'calendar_view' %}" method="get">
+        <button type="submit" class="btn btn-outline-primary">Next month >>></button>
+        <input type="hidden" value="{{todo_calendar.month|add:'1'}}" name="month">
+        <input type="hidden" value="{{todo_calendar.year}}" name="year">
+    </form>
+    </span>
 </div>
 {% endblock %}

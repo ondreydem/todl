@@ -75,6 +75,9 @@ class TodoCalendarToView:
         return res
 
     def get_todoes_by_day(self):
+        """
+        :return: list of todoes-objects by date
+        """
         date = datetime.date(self.year, self.month, self.day)
         todoes = Todo.objects.filter(user_id=self.user.id, timestamp_todo=date)
         return todoes
