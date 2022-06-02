@@ -1,7 +1,6 @@
 from django import forms
 from .models import User, TodoTags
 from django.contrib.auth import authenticate
-from django.utils import timezone
 import datetime
 
 

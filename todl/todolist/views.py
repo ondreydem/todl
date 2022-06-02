@@ -257,9 +257,11 @@ class WeekView(View, LoginRequiredMixin, DataMixin):
 
 class DayView(View, LoginRequiredMixin, DataMixin):
     template_name = 'todolist/day_view.html'
+    title = 'Day view'
     today = datetime.datetime.today()
 
     def get(self, request, year, month, day):
         todo_by_day = TodoCalendarToView(user=request.user, year=year, month=month, day=day)
         return render(request, self.template_name, {'todo_by_day': todo_by_day,
-                                                    'menu': self.logged_menu})
+                                                    'menu': self.logged_menu,
+                                                    'title': self.title, })

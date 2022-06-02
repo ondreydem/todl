@@ -9,24 +9,28 @@ class DataMixin:
     Class to realise DRY principe
     """
 
-    menu = [{'title': 'About', 'url_name': 'about'},
-            {'title': 'Login', 'url_name': 'login'},
-            {'title': 'Registration', 'url_name': 'register'},
-            ]
+    menu = [
+        {'title': 'About', 'url_name': 'about'},
+        {'title': 'Login', 'url_name': 'login'},
+        {'title': 'Registration', 'url_name': 'register'},
+    ]
 
-    logged_menu = [{'title': 'About', 'url_name': 'about'},
-                   {'title': 'Logout', 'url_name': 'logout'},
-                   {'title': 'Completed todoes', 'url_name': 'completed_todoes'},
-                   {'title': 'Your todoes', 'url_name': 'todoes'},
-                   {'title': 'Your TodoTags', 'url_name': 'edit_tags'},
-                   {'title': 'Calendar view', 'url_name': 'calendar_view'},
-                   ]
+    logged_menu = [
+        {'title': 'About', 'url_name': 'about'},
+        {'title': 'Logout', 'url_name': 'logout'},
+        {'title': 'Completed todoes', 'url_name': 'completed_todoes'},
+        {'title': 'Your todoes', 'url_name': 'todoes'},
+        {'title': 'Your TodoTags', 'url_name': 'edit_tags'},
+        {'title': 'Calendar view', 'url_name': 'calendar_view'},
+    ]
 
-    base_tags = [{'tag_name': 'Task'},
-                 {'tag_name': 'Meeting'},
-                 {'tag_name': 'Work'},
-                 {'tag_name': 'Home'}
-                 ]
+    base_tags = [
+        {'tag_name': 'Task'},
+        {'tag_name': 'Meeting'},
+        {'tag_name': 'Work'},
+        {'tag_name': 'Home'},
+        {'tag_name': 'Other'},
+    ]
 
 
 class TodoCalendarToView:
