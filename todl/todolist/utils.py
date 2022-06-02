@@ -1,6 +1,7 @@
 from .models import *
 import calendar
 import datetime
+from .models import Todo, TodoTags
 from django.utils.timezone import make_aware
 
 
@@ -87,3 +88,39 @@ class TodoCalendarToView:
         date = datetime.date(self.year, self.month, self.day)
         todoes = Todo.objects.filter(user_id=self.user.id, timestamp_todo=date)
         return todoes
+
+
+class AddTodo:
+    """
+    Class that separate part of todoes adding functional from view-classes.
+    """
+
+    def __init__(self, request, form):
+        """
+        :param request: django request-object from view function/class
+        :param form: django form object
+        """
+        self.todo = None
+        self.request = request
+        self.form = form
+        self.user = request.user
+
+    def __get_cleaned_data(self):
+        return self.form.cleaned_data
+
+    def add_todo(self):
+        cd = self.__get_cleaned_data()
+        self.todo = Todo.objects.create(
+            title=cd.get('title'),
+            timestamp_todo=cd.get('timestamp_todo'),
+            user_id=self.user.id
+        )
+        self.todo.save()
+        self.__add_tags()
+
+    def __add_tags(self):
+        cd = self.__get_cleaned_data()
+        if cd.get('tag'):
+            for t in cd.get('tag'):
+                tag = TodoTags.objects.filter(user_id=self.user.id).get(tag_name=t)
+                self.todo.tags.add(tag)

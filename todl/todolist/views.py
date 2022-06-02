@@ -6,7 +6,7 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
-from .utils import DataMixin, TodoCalendarToView
+from .utils import DataMixin, TodoCalendarToView, AddTodo
 from .forms import RegisterForm, LoginForm, AddingTodoForm, EditTodoForm, CreateTagForm
 from .models import User, Todo, TodoTags
 
@@ -111,18 +111,10 @@ class TodoesPage(View, DataMixin, LoginRequiredMixin):
 
     def post(self, request):
         form = AddingTodoForm(request.POST, user=request.user)
-        user = request.user
+        add_todo = AddTodo(request, form)
         if form.is_valid():
-            cd = form.cleaned_data
-            todo = Todo.objects.create(title=cd.get('title'),
-                                       timestamp_todo=cd.get('timestamp_todo'),
-                                       user_id=user.id)
-            todo.save()
-            if cd.get('tag'):
-                for t in cd.get('tag'):
-                    tag = TodoTags.objects.filter(user_id=user.id).get(tag_name=t)
-                    todo.tags.add(tag)
-        return self.get(request, form.errors)
+            add_todo.add_todo()
+        return self.get(request, errors=form.errors)
 
 
 class RemoveTodo(View, LoginRequiredMixin):
@@ -137,7 +129,7 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
     title = 'Edit todo'
     template_name = 'todolist/edit_todo.html'
 
-    def get(self, request, todo_id):
+    def get(self, request, todo_id, errors=None):
         todo = Todo.objects.get(id=todo_id)
         tags = [tag.tag_name for tag in todo.tags.all()]
         form = EditTodoForm(user=request.user,
@@ -148,13 +140,14 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
         return render(request, self.template_name, {'menu': self.logged_menu,
                                                     'title': self.title,
                                                     'form': form,
-                                                    'todo': todo})
+                                                    'todo': todo,
+                                                    'errors': errors})
 
     def post(self, request, todo_id):
         todo_id = request.POST.get('todo_id')
         todo = Todo.objects.get(id=todo_id)
         form = EditTodoForm(request.POST, user=request.user)
-        if form.is_valid() and form.has_changed():
+        if form.is_valid():
             cd = form.cleaned_data
             for tag in TodoTags.objects.filter(user_id=request.user.id):
                 if tag.tag_name in cd.get('tag'):
@@ -165,7 +158,8 @@ class EditTodo(View, LoginRequiredMixin, DataMixin):
             todo.body = cd.get('body')
             todo.timestamp_todo = cd.get('timestamp_todo')
             todo.save()
-        return redirect('todoes')
+            return redirect('todoes')
+        return self.get(request, todo_id, errors=form.errors)
 
 
 class DoneTodo(View, LoginRequiredMixin):
@@ -258,10 +252,19 @@ class WeekView(View, LoginRequiredMixin, DataMixin):
 class DayView(View, LoginRequiredMixin, DataMixin):
     template_name = 'todolist/day_view.html'
     title = 'Day view'
-    today = datetime.datetime.today()
 
-    def get(self, request, year, month, day):
+    def get(self, request, year, month, day, errors=None):
+        form = AddingTodoForm(user=request.user, initial={'timestamp_todo': datetime.date(year, month, day)})
         todo_by_day = TodoCalendarToView(user=request.user, year=year, month=month, day=day)
         return render(request, self.template_name, {'todo_by_day': todo_by_day,
                                                     'menu': self.logged_menu,
-                                                    'title': self.title, })
+                                                    'title': self.title,
+                                                    'form': form,
+                                                    'errors': errors})
+
+    def post(self, request, year, month, day):
+        form = AddingTodoForm(request.POST, user=request.user)
+        add_todo = AddTodo(request, form)
+        if form.is_valid():
+            add_todo.add_todo()
+        return self.get(request, year, month, day, errors=form.errors)

@@ -4,16 +4,16 @@
 <h1>{{todo_by_day.month_name}} {{todo_by_day.day}}, {{todo_by_day.year}}</h1>
 
 <table class="table table-sm">
-{% for todo in todo_by_day.day_todoes %}
+    {% for todo in todo_by_day.day_todoes %}
     <tr>
         <th scope="col"><a href="{% url 'todo' todo.pk %}">{{todo.title}}</a></th>
         <th scope="col">{{todo.timestamp_todo.date}}</th>
         <th>
-        {% if todo.tags %}
-        {% for tag in todo.tags.all %}
+            {% if todo.tags %}
+            {% for tag in todo.tags.all %}
             <a href="#" class="badge badge-primary">{{tag.tag_name}}</a>
-        {% endfor %}
-        {% endif %}
+            {% endfor %}
+            {% endif %}
         </th>
         <th scope="col">
             <form action="{% url 'edit_todo' todo.id%}" method="get" name="todoes">
@@ -40,7 +40,22 @@
             </form>
         </th>
     </tr>
-{% endfor %}
+    {% endfor %}
 </table>
+<br>
+<hr>
+<h3>Add new Todo</h3>
+<form action="{% url 'day_view' year=todo_by_day.year month=todo_by_day.month day=todo_by_day.day %}" method="post">
+    {% csrf_token %}
+    {% if errors %}
+    <div class="alert alert-danger" role="alert">{{ errors }}</div>
+    {% endif %}
+
+    {% for f in form %}
+    <p>{{f.label}}: {{f}}</p>
+    {% endfor %}
+    <input type="hidden" value="todoes" name="from">
+    <p><input type="submit" value="Add Todo!" class="btn btn-primary"></p>
+</form>
 
 {% endblock %}

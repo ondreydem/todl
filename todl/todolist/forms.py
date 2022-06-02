@@ -87,8 +87,8 @@ class EditTodoForm(forms.Form):
                            max_length=2000,
                            required=False,
                            widget=forms.Textarea(attrs={'class': 'form-control'}))
-    timestamp_todo = forms.DateTimeField(label='Todo deadline',
-                                         widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
+    timestamp_todo = forms.DateField(label='Todo deadline',
+                                     widget=forms.SelectDateWidget(attrs={'class': 'form-control'}))
     tag = forms.MultipleChoiceField(label='Choose tags',
                                     required=False,
                                     widget=forms.CheckboxSelectMultiple)
@@ -98,6 +98,13 @@ class EditTodoForm(forms.Form):
         super().__init__(*args, **kwargs)
         tags = [(tag.tag_name, tag.tag_name) for tag in TodoTags.objects.filter(user_id=self.user.id)]
         self.fields['tag'].choices = tags
+
+    def clean(self):
+        cd = super(EditTodoForm, self).clean()
+        if cd.get('timestamp_todo') < datetime.date.today():
+            msg = "You can't add a todo to the past"
+            self.add_error('timestamp_todo', msg)
+        return cd
 
 
 class CreateTagForm(forms.Form):
