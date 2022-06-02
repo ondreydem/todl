@@ -11,6 +11,7 @@
     {% for f in form %}
     <p>{{f.label}}: {{f}}</p>
     {% endfor %}
+    <input type="hidden" value="todoes" name="from">
     <p><input type="submit" value="Add Todo!" class="btn btn-primary"></p>
 </form>
 
